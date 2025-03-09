@@ -1,11 +1,9 @@
 import time
 # pip install raspberrypi-tm1637
-from tm1637 import TM1637
+import tm1637
 
 
-BRIGHTNESS = 3 # 0-7
-
-display = TM1637(23, 24, BRIGHTNESS)
+display = tm1637.TM1637(23, 24)
 
 colon = True
 while True:
