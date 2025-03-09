@@ -1,83 +1,59 @@
-"""MCP23008 I2C LCD backpack"""
 import time
-# pip install adafruit-circuitpython-charlcd
-import board
-from adafruit_character_lcd.character_lcd_i2c import Character_LCD_I2C
-# pip install adafruit-circuitpython-pcf8574
-from adafruit_pcf8574 import PCF8574
-from adafruit_character_lcd.character_lcd import Character_LCD_Mono
+# pip install RPLCD smbus2
+from RPLCD.i2c import CharLCD
 
 
-class Character_LCD_I2C_PCF(Character_LCD_Mono):
-
-    def __init__(
-        self,
-        i2c,
-        columns,
-        lines,
-        address = None,
-        backlight_inverted = False,
-    ) -> None:
-
-        if address:
-            pcf = PCF8574(i2c, address=address)
-        else:
-            pcf = PCF8574(i2c)
-        super().__init__(
-            pcf.get_pin(1),
-            pcf.get_pin(2),
-            pcf.get_pin(3),
-            pcf.get_pin(4),
-            pcf.get_pin(5),
-            pcf.get_pin(6),
-            columns,
-            lines,
-            backlight_pin=pcf.get_pin(7),
-            backlight_inverted=backlight_inverted,
-        )
-
-
-LCD_COLS = 16
-LCD_ROWS = 2
 ADDR = 0x27
+LCD_ROWS = 2
+LCD_COLS = 16
+BACKPACK = "PCF8574"
 
-i2c = board.I2C()
-lcd = Character_LCD_I2C(i2c, LCD_COLS, LCD_ROWS, ADDR)
+display = CharLCD(BACKPACK, ADDR, cols=LCD_COLS, rows=LCD_ROWS, backlight_enabled=False)
 
-# Turn backlight on
-lcd.backlight = True
-# Print a two line message
-lcd.message = "Hello\nCircuitPython"
+
+def scroll(string, row=0, delay=0.1):
+    string = string.center(2*display.lcd.cols + len(string))
+
+    for i in range(len(string)+1 - display.lcd.cols):
+        display.cursor_pos = (row, 0)
+        display.write_string(string[i:i+display.lcd.cols])
+        time.sleep(delay)
+
+
+def scroll_n(string, row=0, n=-1, delay=0.1):
+    while n!=0:
+        scroll(string, row, delay)
+        n -= 1
+
+
+display.cursor_mode = "blink"
+
+display.write_string("Hello\r\nworld")
 time.sleep(5)
-lcd.clear()
-# Print two line message right to left
-lcd.text_direction = lcd.RIGHT_TO_LEFT
-lcd.message = "Hello\nCircuitPython"
+display.clear()
+
+display.cursor_mode = "line"
+display.text_align_mode = "right"
+
+display.cursor_pos = (0, display.lcd.cols-1)
+display.write_string("Hello"[::-1])
+display.crlf()
+display.write_string("world"[::-1])
 time.sleep(5)
-# Return text direction to left to right
-lcd.text_direction = lcd.LEFT_TO_RIGHT
-lcd.clear()
-# Display cursor
-lcd.cursor = True
-lcd.message = "Cursor! "
+display.clear()
+
+display.cursor_mode = "hide"
+display.text_align_mode = "left"
+
+display.cursor_pos = (display.lcd.rows-1, 0)
+display.write_string("Hello, world!")
 time.sleep(5)
-lcd.clear()
-# Display blinking cursor
-lcd.blink = True
-lcd.message = "Blinky Cursor!"
-time.sleep(5)
-lcd.blink = False
-lcd.clear()
-# Create message to scroll
-scroll_msg = "<-- Scroll"
-lcd.message = scroll_msg
-# Scroll message to the left
-for i in range(len(scroll_msg)):
-    time.sleep(0.5)
-    lcd.move_left()
-lcd.clear()
-# Turn backlight off
-lcd.backlight = False
-lcd.message = "Going to sleep\nCya later!"
-time.sleep(5)
-lcd.clear()
+display.clear()
+
+display.backlight_enabled = True
+
+display.write_string("Hello,")
+scroll_n("Asadullah Shaikh", row=1, n=5)
+display.clear()
+
+display.close()

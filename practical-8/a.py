@@ -7,16 +7,21 @@ picam = Picamera2()
 
 sconfig = picam.create_still_configuration()
 picam.configure(sconfig)
-print('Say "cheese!"')
-picam.start_preview()
+
+picam.start_preview(True)
 picam.start()
+
+print("Taking image...")
 time.sleep(1)
 picam.capture_file("image.jpg")
+print("Image captured")
+
 picam.stop_preview()
 picam.stop()
-print('Image captured')
 
-# same as above, using convenience method
-print('Say "cheese!"')
-picam.start_and_capture_file()
-print('Image captured')
+# using convenience method
+# print("Taking image...")
+# picam.start_and_capture_file()
+# print("Image captured")
+
+picam.close()
