@@ -3,8 +3,7 @@ import time
 from gpiozero import LED
 
 
-gpio_pins = (5, 13, 21)
-leds = [LED(pin) for pin in gpio_pins]
+leds = [LED(pin) for pin in (5, 13, 21)]
 
 while True:
     for led in leds:
