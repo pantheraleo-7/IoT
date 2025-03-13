@@ -1,16 +1,16 @@
 import time
+from collections import deque
 
-from gpiozero import LED
+from gpiozero import LEDBoard
 
 
-leds = [LED(pin) for pin in (5, 13, 21)]
+leds = LEDBoard(5, 6, 13, 19, 26)
+state = deque((1, 0, 0, 0, 0))
+direction = 1
 
 while True:
-    for led in leds:
-        led.on()
+    for _ in range(len(leds)-1):
+        leds.value = state
         time.sleep(0.2)
-        led.off()
-    for led in reversed(leds):
-        led.on()
-        time.sleep(0.2)
-        led.off()
+        state.rotate(direction)
+    direction *= -1
