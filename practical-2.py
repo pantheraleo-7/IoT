@@ -1,5 +1,5 @@
 import time
-# pip install raspberrypi-tm1637
+# pip install python-tm1637
 import tm1637
 
 
